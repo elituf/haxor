@@ -2,6 +2,7 @@ use super::{handle::Handle, snapshot};
 
 use derive_more::derive::Display;
 
+#[allow(dead_code)]
 #[derive(Debug, Default)]
 pub struct Process {
     name: String,
@@ -28,7 +29,7 @@ impl Process {
         };
         let Some(snapshot) = snapshot else {
             return Err(crate::Error::ProcessError(format!(
-                "couldn't find a process with identifier `{identifier}`",
+                "failed to find a process with identifier `{identifier}`",
             )));
         };
         let process = Self {
@@ -46,5 +47,18 @@ impl Process {
 
     pub fn with_name(name: &str) -> Result<Self, crate::Error> {
         Self::from(&Identifier::Name(name.to_string()))
+    }
+
+    pub fn module(&self, name: &str) -> Result<snapshot::Module, crate::Error> {
+        dbg!(snapshot::Module::get_modules(self.id)?);
+        let Some(module) = snapshot::Module::get_modules(self.id)?
+            .into_iter()
+            .find(|snapshot| snapshot.name == name)
+        else {
+            return Err(crate::Error::ProcessError(format!(
+                "failed to find a module with identifier `{name}`",
+            )));
+        };
+        Ok(module)
     }
 }

@@ -2,11 +2,11 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("couldn't get handle to process")]
+    #[error("failed to obtain handle")]
     HandleError(String),
-    #[error("couldn't create instance of process")]
+    #[error("failed to create instance")]
     ProcessError(String),
-    #[error("couldn't create snapshot")]
+    #[error("failed to create snapshot")]
     SnapshotError(String),
     #[error("failed to convert integer")]
     IntegerConversionError(#[from] std::num::TryFromIntError),
