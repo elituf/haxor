@@ -1,4 +1,5 @@
 mod handle;
+mod memory;
 mod process;
 mod snapshot;
 

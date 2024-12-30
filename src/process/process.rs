@@ -1,15 +1,21 @@
-use super::{handle::Handle, snapshot};
+use super::{
+    handle::Handle,
+    memory::{read_process_memory, write_process_memory},
+    snapshot,
+};
 
 use derive_more::derive::Display;
 
-#[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Process {
-    name: String,
-    id: u32,
-    base_address: usize,
-    handle: Handle,
+    pub name: String,
+    pub id: u32,
+    pub base_address: usize,
+    pub handle: Handle,
 }
+
+unsafe impl Send for Process {}
+unsafe impl Sync for Process {}
 
 #[derive(Display)]
 pub enum Identifier {
@@ -32,12 +38,13 @@ impl Process {
                 "failed to find a process with identifier `{identifier}`",
             )));
         };
-        let process = Self {
+        let mut process = Self {
             name: snapshot.name,
             id: snapshot.id,
             base_address: 0,
             handle: Handle::from_pid(snapshot.id)?,
         };
+        process.base_address = process.module(&process.name)?.base_address;
         Ok(process)
     }
 
@@ -50,7 +57,6 @@ impl Process {
     }
 
     pub fn module(&self, name: &str) -> Result<snapshot::Module, crate::Error> {
-        dbg!(snapshot::Module::get_modules(self.id)?);
         let Some(module) = snapshot::Module::get_modules(self.id)?
             .into_iter()
             .find(|snapshot| snapshot.name == name)
@@ -60,5 +66,37 @@ impl Process {
             )));
         };
         Ok(module)
+    }
+
+    pub fn read_mem<T: Default>(&self, address: usize) -> Result<T, crate::Error> {
+        let mut value = Default::default();
+        read_process_memory(&self.handle, address, &mut value)?;
+        Ok(value)
+    }
+
+    pub fn read_mem_from_ptr_chain<T: Default>(&self, chain: &[usize]) -> Result<T, crate::Error> {
+        let mut chain = chain.to_vec();
+        let mut address = chain.remove(0);
+        while chain.len() > 1 {
+            address += chain.remove(0);
+            address = self.read_mem(address)?;
+        }
+        let value = self.read_mem(address + chain.remove(0))?;
+        Ok(value)
+    }
+
+    pub fn get_addr_from_ptr_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
+        let mut chain = chain.to_vec();
+        let mut address = chain.remove(0);
+        while chain.len() > 1 {
+            address += chain.remove(0);
+            address = self.read_mem(address)?;
+        }
+        Ok(address + chain.remove(0))
+    }
+
+    pub fn write_mem<T: Default>(&self, address: usize, mut value: T) -> Result<(), crate::Error> {
+        write_process_memory(&self.handle, address, &mut value)?;
+        Ok(())
     }
 }

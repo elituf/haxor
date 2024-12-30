@@ -10,4 +10,6 @@ pub enum Error {
     SnapshotError(String),
     #[error("failed to convert integer")]
     IntegerConversionError(#[from] std::num::TryFromIntError),
+    #[error("failed to access process memory")]
+    MemoryError(String),
 }

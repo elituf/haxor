@@ -5,7 +5,7 @@ use windows::Win32::System::Threading::{
     OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_READ, PROCESS_VM_WRITE,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Handle(pub HANDLE);
 
 impl Deref for Handle {
