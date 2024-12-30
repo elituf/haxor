@@ -21,15 +21,14 @@ pub enum Identifier {
 
 impl Process {
     pub fn from(identifier: &Identifier) -> Result<Self, crate::Error> {
-        let snapshot = match identifier {
+        let Some(snapshot) = (match identifier {
             Identifier::Id(pid) => ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.id == *pid),
             Identifier::Name(ref name) => ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.name == *name),
-        };
-        let Some(snapshot) = snapshot else {
+        }) else {
             return Err(crate::Error::ProcessError(format!(
                 "failed to find a process with identifier `{identifier}`",
             )));
