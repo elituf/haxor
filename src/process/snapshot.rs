@@ -98,7 +98,7 @@ impl Module {
             let path = String::from_utf16_lossy(&module_entry_32_w.szExePath)
                 .trim_end_matches('\0')
                 .to_string();
-            let module = Module {
+            let module = Self {
                 process_id: pid,
                 name,
                 path,

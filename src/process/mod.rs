@@ -1,3 +1,5 @@
+#![allow(clippy::module_inception)]
+
 mod handle;
 mod memory;
 mod process;

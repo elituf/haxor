@@ -8,6 +8,9 @@ use windows::Win32::System::Threading::{
 #[derive(Debug, Default, Clone)]
 pub struct Handle(pub HANDLE);
 
+unsafe impl Send for Handle {}
+unsafe impl Sync for Handle {}
+
 impl Deref for Handle {
     type Target = HANDLE;
 

@@ -1,8 +1,4 @@
-use super::{
-    handle::Handle,
-    memory::{read_process_memory, write_process_memory},
-    snapshot,
-};
+use super::{handle::Handle, memory, snapshot};
 
 use derive_more::derive::Display;
 
@@ -70,7 +66,7 @@ impl Process {
 
     pub fn read_mem<T: Default>(&self, address: usize) -> Result<T, crate::Error> {
         let mut value = Default::default();
-        read_process_memory(&self.handle, address, &mut value)?;
+        memory::read(&self.handle, address, &mut value)?;
         Ok(value)
     }
 
@@ -96,7 +92,7 @@ impl Process {
     }
 
     pub fn write_mem<T: Default>(&self, address: usize, mut value: T) -> Result<(), crate::Error> {
-        write_process_memory(&self.handle, address, &mut value)?;
+        memory::write(&self.handle, address, &mut value)?;
         Ok(())
     }
 }
