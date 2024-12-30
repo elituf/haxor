@@ -11,5 +11,5 @@ pub enum Error {
     #[error("failed to create snapshot")]
     SnapshotError(String),
     #[error("failed to convert integer")]
-    IntegerConversionError(#[from] std::num::TryFromIntError),
+    ConvertIntegerError(#[from] std::num::TryFromIntError),
 }

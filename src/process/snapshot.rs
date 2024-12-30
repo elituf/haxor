@@ -57,7 +57,6 @@ impl Process {
 
 #[derive(Debug)]
 pub struct Module {
-    pub process_id: u32,
     pub name: String,
     pub path: String,
     pub base_address: usize,
@@ -99,7 +98,6 @@ impl Module {
                 .trim_end_matches('\0')
                 .to_string();
             let module = Self {
-                process_id: pid,
                 name,
                 path,
                 base_address: module_entry_32_w.modBaseAddr as usize,

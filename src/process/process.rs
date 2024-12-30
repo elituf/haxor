@@ -1,4 +1,4 @@
-use super::{handle::Handle, memory, snapshot};
+use super::{handle::Handle, memory, module::Module, ModuleSnapshot, ProcessSnapshot};
 
 use derive_more::derive::Display;
 
@@ -22,10 +22,10 @@ pub enum Identifier {
 impl Process {
     pub fn from(identifier: &Identifier) -> Result<Self, crate::Error> {
         let snapshot = match identifier {
-            Identifier::Id(pid) => snapshot::Process::get_processes()?
+            Identifier::Id(pid) => ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.id == *pid),
-            Identifier::Name(ref name) => snapshot::Process::get_processes()?
+            Identifier::Name(ref name) => ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.name == *name),
         };
@@ -52,14 +52,21 @@ impl Process {
         Self::from(&Identifier::Name(name.to_string()))
     }
 
-    pub fn module(&self, name: &str) -> Result<snapshot::Module, crate::Error> {
-        let Some(module) = snapshot::Module::get_modules(self.id)?
+    pub fn module(&self, name: &str) -> Result<Module, crate::Error> {
+        let Some(snapshot) = ModuleSnapshot::get_modules(self.id)?
             .into_iter()
             .find(|snapshot| snapshot.name == name)
         else {
             return Err(crate::Error::ProcessError(format!(
                 "failed to find a module with identifier `{name}`",
             )));
+        };
+        let module = Module {
+            process_id: self.id,
+            name: snapshot.name,
+            path: snapshot.path,
+            base_address: snapshot.base_address,
+            base_size: snapshot.base_size,
         };
         Ok(module)
     }
@@ -81,7 +88,7 @@ impl Process {
         Ok(value)
     }
 
-    pub fn get_addr_from_ptr_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
+    pub fn addr_from_ptr_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
         let mut chain = chain.to_vec();
         let mut address = chain.remove(0);
         while chain.len() > 1 {
