@@ -2,11 +2,14 @@
 name = "haxor"
 version = "0.1.0"
 edition = "2021"
+description = "memory hacking library"
+repository = "https://codeberg.org/futile/haxor"
+license = "Apache-2.0"
+keywords = ["memory", "game", "hacking", "process"]
 
 [dependencies]
 derive_more = { version = "1.0.0", features = ["display"] }
 thiserror = "2.0.9"
-windows-core = "0.58.0"
 
 [dependencies.windows]
 version = "0.58.0"
@@ -14,5 +17,5 @@ features = [
     "Win32_Foundation",
     "Win32_System_Threading",
     "Win32_System_Diagnostics_ToolHelp",
-    "Win32_System_Diagnostics_Debug"
+    "Win32_System_Diagnostics_Debug",
 ]
