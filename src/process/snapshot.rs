@@ -1,15 +1,17 @@
+#![allow(clippy::module_name_repetitions)]
+
 use windows::Win32::System::Diagnostics::ToolHelp::{
     CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, Process32FirstW, Process32NextW,
     MODULEENTRY32W, PROCESSENTRY32W, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, TH32CS_SNAPPROCESS,
 };
 
 #[derive(Debug)]
-pub struct Process {
+pub struct ProcessSnapshot {
     pub id: u32,
     pub name: String,
 }
 
-impl Process {
+impl ProcessSnapshot {
     pub fn get_processes() -> Result<Vec<Self>, crate::Error> {
         let snapshot = unsafe {
             match CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) {
@@ -56,14 +58,14 @@ impl Process {
 }
 
 #[derive(Debug)]
-pub struct Module {
+pub struct ModuleSnapshot {
     pub name: String,
     pub path: String,
     pub base_address: usize,
     pub base_size: usize,
 }
 
-impl Module {
+impl ModuleSnapshot {
     pub fn get_modules(pid: u32) -> Result<Vec<Self>, crate::Error> {
         let snapshot = unsafe {
             match CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) {

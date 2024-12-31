@@ -1,4 +1,4 @@
-use super::{handle::Handle, memory, module::Module, ModuleSnapshot, ProcessSnapshot};
+use super::{handle::Handle, memory, module::Module, snapshot};
 
 use derive_more::derive::Display;
 
@@ -35,10 +35,10 @@ impl Process {
     pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, crate::Error> {
         let identifier = identifier.into();
         let Some(snapshot) = (match identifier {
-            Identifier::Pid(pid) => ProcessSnapshot::get_processes()?
+            Identifier::Pid(pid) => snapshot::ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.id == pid),
-            Identifier::Name(ref name) => ProcessSnapshot::get_processes()?
+            Identifier::Name(ref name) => snapshot::ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.name == *name),
         }) else {
@@ -57,7 +57,7 @@ impl Process {
     }
 
     pub fn module(&self, name: &str) -> Result<Module, crate::Error> {
-        let Some(snapshot) = ModuleSnapshot::get_modules(self.id)?
+        let Some(snapshot) = snapshot::ModuleSnapshot::get_modules(self.id)?
             .into_iter()
             .find(|snapshot| snapshot.name == name)
         else {
