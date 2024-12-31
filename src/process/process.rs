@@ -3,8 +3,11 @@ use super::{handle::Handle, memory, module::Module, snapshot};
 use derive_more::derive::Display;
 
 #[derive(Display)]
+/// an identifier for searching for a process
 pub enum Identifier {
+    /// the process id
     Pid(u32),
+    /// the process name
     Name(String),
 }
 
@@ -21,10 +24,15 @@ impl From<&str> for Identifier {
 }
 
 #[derive(Debug, Default, Clone)]
+/// a process running on the system
 pub struct Process {
+    /// the process name (szExeFile)
     pub name: String,
+    /// the process id  (th32ProcessID)
     pub id: u32,
+    /// the base address of the module with the same name as `name` (modBaseAddr)
     pub base_address: usize,
+    /// the process handle (HANDLE)
     pub handle: Handle,
 }
 
@@ -32,6 +40,7 @@ unsafe impl Send for Process {}
 unsafe impl Sync for Process {}
 
 impl Process {
+    /// initialize a `Process` from a pid or a process name
     pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, crate::Error> {
         let identifier = identifier.into();
         let Some(snapshot) = (match identifier {
@@ -56,6 +65,7 @@ impl Process {
         Ok(process)
     }
 
+    /// get the `Module` of a `Process` by name
     pub fn module(&self, name: &str) -> Result<Module, crate::Error> {
         let Some(snapshot) = snapshot::ModuleSnapshot::get_modules(self.id)?
             .into_iter()
@@ -75,6 +85,7 @@ impl Process {
         Ok(module)
     }
 
+    /// follow a pointer chain to the end and return an address
     pub fn resolve_pointer_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
         let mut chain = chain.to_vec();
         let mut address = chain.remove(0);
@@ -85,12 +96,14 @@ impl Process {
         Ok(address + chain.remove(0))
     }
 
+    /// read a given `address` of process's memory
     pub fn read_mem<T: Default>(&self, address: usize) -> Result<T, crate::Error> {
         let mut value = Default::default();
         memory::read(&self.handle, address, &mut value)?;
         Ok(value)
     }
 
+    /// write a `value` at given `address` of process's memory
     pub fn write_mem<T: Default>(&self, address: usize, mut value: T) -> Result<(), crate::Error> {
         memory::write(&self.handle, address, &mut value)?;
         Ok(())
