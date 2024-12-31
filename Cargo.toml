@@ -10,6 +10,7 @@ keywords = ["memory", "game", "hacking", "process"]
 
 [dependencies]
 derive_more = { version = "1.0.0", features = ["display"] }
+log = "0.4.22"
 thiserror = "2.0.9"
 
 [dependencies.windows]

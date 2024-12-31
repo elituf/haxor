@@ -21,12 +21,10 @@ impl Deref for Handle {
 
 impl Drop for Handle {
     fn drop(&mut self) {
-        if self.0 != INVALID_HANDLE_VALUE {
-            unsafe {
-                if let Err(why) = CloseHandle(**self) {
-                    eprintln!("failed to close handle: {why}");
-                };
-            }
+        unsafe {
+            if let Err(why) = CloseHandle(**self) {
+                log::error!("failed to close handle: {why}");
+            };
         }
     }
 }
