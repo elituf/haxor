@@ -2,6 +2,24 @@ use super::{handle::Handle, memory, module::Module, ModuleSnapshot, ProcessSnaps
 
 use derive_more::derive::Display;
 
+#[derive(Display)]
+pub enum Identifier {
+    Pid(u32),
+    Name(String),
+}
+
+impl From<u32> for Identifier {
+    fn from(value: u32) -> Self {
+        Self::Pid(value)
+    }
+}
+
+impl From<&str> for Identifier {
+    fn from(value: &str) -> Self {
+        Self::Name(value.to_string())
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct Process {
     pub name: String,
@@ -13,18 +31,13 @@ pub struct Process {
 unsafe impl Send for Process {}
 unsafe impl Sync for Process {}
 
-#[derive(Display)]
-pub enum Identifier {
-    Id(u32),
-    Name(String),
-}
-
 impl Process {
-    pub fn from(identifier: &Identifier) -> Result<Self, crate::Error> {
+    pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, crate::Error> {
+        let identifier = identifier.into();
         let Some(snapshot) = (match identifier {
-            Identifier::Id(pid) => ProcessSnapshot::get_processes()?
+            Identifier::Pid(pid) => ProcessSnapshot::get_processes()?
                 .into_iter()
-                .find(|snapshot| snapshot.id == *pid),
+                .find(|snapshot| snapshot.id == pid),
             Identifier::Name(ref name) => ProcessSnapshot::get_processes()?
                 .into_iter()
                 .find(|snapshot| snapshot.name == *name),
@@ -41,14 +54,6 @@ impl Process {
         };
         process.base_address = process.module(&process.name)?.base_address;
         Ok(process)
-    }
-
-    pub fn with_pid(pid: u32) -> Result<Self, crate::Error> {
-        Self::from(&Identifier::Id(pid))
-    }
-
-    pub fn with_name(name: &str) -> Result<Self, crate::Error> {
-        Self::from(&Identifier::Name(name.to_string()))
     }
 
     pub fn module(&self, name: &str) -> Result<Module, crate::Error> {
@@ -70,24 +75,7 @@ impl Process {
         Ok(module)
     }
 
-    pub fn read_mem<T: Default>(&self, address: usize) -> Result<T, crate::Error> {
-        let mut value = Default::default();
-        memory::read(&self.handle, address, &mut value)?;
-        Ok(value)
-    }
-
-    pub fn read_mem_from_ptr_chain<T: Default>(&self, chain: &[usize]) -> Result<T, crate::Error> {
-        let mut chain = chain.to_vec();
-        let mut address = chain.remove(0);
-        while chain.len() > 1 {
-            address += chain.remove(0);
-            address = self.read_mem(address)?;
-        }
-        let value = self.read_mem(address + chain.remove(0))?;
-        Ok(value)
-    }
-
-    pub fn addr_from_ptr_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
+    pub fn resolve_pointer_chain(&self, chain: &[usize]) -> Result<usize, crate::Error> {
         let mut chain = chain.to_vec();
         let mut address = chain.remove(0);
         while chain.len() > 1 {
@@ -95,6 +83,12 @@ impl Process {
             address = self.read_mem(address)?;
         }
         Ok(address + chain.remove(0))
+    }
+
+    pub fn read_mem<T: Default>(&self, address: usize) -> Result<T, crate::Error> {
+        let mut value = Default::default();
+        memory::read(&self.handle, address, &mut value)?;
+        Ok(value)
     }
 
     pub fn write_mem<T: Default>(&self, address: usize, mut value: T) -> Result<(), crate::Error> {

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Module {
     pub process_id: u32,
     pub name: String,
