@@ -3,13 +3,13 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("failed to obtain handle")]
-    HandleError(String),
+    ObtainHandleError(String),
     #[error("failed to access process memory")]
-    MemoryError(String),
+    AccessMemoryError(String),
     #[error("failed to create process")]
-    ProcessError(String),
+    CreateProcessError(String),
     #[error("failed to create snapshot")]
-    SnapshotError(String),
+    CreateSnapshotError(String),
     #[error("failed to convert integer")]
     ConvertIntegerError(#[from] std::num::TryFromIntError),
 }

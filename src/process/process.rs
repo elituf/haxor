@@ -42,7 +42,7 @@ impl Process {
                 .into_iter()
                 .find(|snapshot| snapshot.name == *name),
         }) else {
-            return Err(crate::Error::ProcessError(format!(
+            return Err(crate::Error::CreateProcessError(format!(
                 "failed to find a process with identifier `{identifier}`",
             )));
         };
@@ -61,7 +61,7 @@ impl Process {
             .into_iter()
             .find(|snapshot| snapshot.name == name)
         else {
-            return Err(crate::Error::ProcessError(format!(
+            return Err(crate::Error::CreateProcessError(format!(
                 "failed to find a module with identifier `{name}`",
             )));
         };

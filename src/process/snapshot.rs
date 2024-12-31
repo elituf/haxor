@@ -17,7 +17,7 @@ impl ProcessSnapshot {
             match CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) {
                 Ok(snapshot) => snapshot,
                 Err(why) => {
-                    return Err(crate::Error::SnapshotError(format!(
+                    return Err(crate::Error::CreateSnapshotError(format!(
                         "failed to create process snapshot: {why}"
                     )))
                 }
@@ -31,7 +31,7 @@ impl ProcessSnapshot {
             match Process32FirstW(snapshot, &mut process_entry_32_w) {
                 Ok(()) => {}
                 Err(why) => {
-                    return Err(crate::Error::SnapshotError(format!(
+                    return Err(crate::Error::CreateSnapshotError(format!(
                         "failed to get first process from snapshot: {why}"
                     )))
                 }
@@ -71,7 +71,7 @@ impl ModuleSnapshot {
             match CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) {
                 Ok(snapshot) => snapshot,
                 Err(why) => {
-                    return Err(crate::Error::SnapshotError(format!(
+                    return Err(crate::Error::CreateSnapshotError(format!(
                         "failed to create module snapshot: {why}"
                     )))
                 }
@@ -85,7 +85,7 @@ impl ModuleSnapshot {
             match Module32FirstW(snapshot, &mut module_entry_32_w) {
                 Ok(()) => {}
                 Err(why) => {
-                    return Err(crate::Error::SnapshotError(format!(
+                    return Err(crate::Error::CreateSnapshotError(format!(
                         "failed to get first module from snapshot: {why}"
                     )))
                 }

@@ -35,13 +35,13 @@ impl Handle {
             OpenProcess(PROCESS_ALL_ACCESS, false, pid)
                 .or_else(|_| OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE, false, pid))
                 .map_err(|why| {
-                    crate::Error::HandleError(format!(
+                    crate::Error::ObtainHandleError(format!(
                         "failed to open process with needed access: {why}",
                     ))
                 })?
         };
         if handle == INVALID_HANDLE_VALUE {
-            return Err(crate::Error::HandleError(
+            return Err(crate::Error::ObtainHandleError(
                 "failed to get a valid handle".to_string(),
             ));
         }

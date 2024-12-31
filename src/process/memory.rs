@@ -14,7 +14,7 @@ pub fn read<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), cra
             None,
         ) {
             Ok(()) => Ok(()),
-            Err(why) => Err(crate::Error::MemoryError(format!(
+            Err(why) => Err(crate::Error::AccessMemoryError(format!(
                 "failed to read memory: {why}"
             ))),
         }
@@ -31,7 +31,7 @@ pub fn write<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), cr
             None,
         ) {
             Ok(()) => Ok(()),
-            Err(why) => Err(crate::Error::MemoryError(format!(
+            Err(why) => Err(crate::Error::AccessMemoryError(format!(
                 "failed to write memory: {why}"
             ))),
         }
