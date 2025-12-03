@@ -39,9 +39,6 @@ pub struct Process {
     pub handle: Handle,
 }
 
-unsafe impl Send for Process {}
-unsafe impl Sync for Process {}
-
 impl Process {
     /// initialize a `Process` from a pid or a process name
     pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, Error> {
