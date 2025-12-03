@@ -1,11 +1,11 @@
 [package]
 name = "haxor"
 version = "0.1.0"
-edition = "2021"
-description = "memory hacking library"
+edition = "2024"
 readme = "README.md"
-repository = "https://codeberg.org/futile/haxor"
 license = "Apache-2.0"
+description = "memory hacking library"
+repository = "https://github.com/elituf/haxor"
 keywords = ["memory", "game", "hacking", "process"]
 
 [dependencies]
