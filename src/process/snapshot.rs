@@ -13,26 +13,21 @@ pub struct ProcessSnapshot {
 
 impl ProcessSnapshot {
     pub fn get_processes() -> Result<Vec<Self>, crate::Error> {
-        let snapshot = match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) } {
-            Ok(snapshot) => snapshot,
-            Err(why) => {
-                return Err(crate::Error::CreateSnapshotError(format!(
+        let snapshot =
+            unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) }.map_err(|why| {
+                crate::Error::CreateSnapshotError(format!(
                     "failed to create process snapshot: {why}"
-                )))
-            }
-        };
+                ))
+            })?;
         let mut process_entry_32_w = PROCESSENTRY32W {
             dwSize: u32::try_from(size_of::<PROCESSENTRY32W>())?,
             ..Default::default()
         };
-        match unsafe { Process32FirstW(snapshot, &mut process_entry_32_w) } {
-            Ok(()) => {}
-            Err(why) => {
-                return Err(crate::Error::CreateSnapshotError(format!(
-                    "failed to get first process from snapshot: {why}"
-                )))
-            }
-        };
+        unsafe { Process32FirstW(snapshot, &mut process_entry_32_w) }.map_err(|why| {
+            crate::Error::CreateSnapshotError(format!(
+                "failed to get first process from snapshot: {why}"
+            ))
+        })?;
         let mut processes = Vec::new();
         loop {
             let name = String::from_utf16_lossy(&process_entry_32_w.szExeFile)
@@ -62,27 +57,21 @@ pub struct ModuleSnapshot {
 impl ModuleSnapshot {
     pub fn get_modules(pid: u32) -> Result<Vec<Self>, crate::Error> {
         let snapshot =
-            match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) }
-            {
-                Ok(snapshot) => snapshot,
-                Err(why) => {
-                    return Err(crate::Error::CreateSnapshotError(format!(
+            unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) }
+                .map_err(|why| {
+                    crate::Error::CreateSnapshotError(format!(
                         "failed to create module snapshot: {why}"
-                    )))
-                }
-            };
+                    ))
+                })?;
         let mut module_entry_32_w = MODULEENTRY32W {
             dwSize: u32::try_from(size_of::<MODULEENTRY32W>())?,
             ..Default::default()
         };
-        match unsafe { Module32FirstW(snapshot, &mut module_entry_32_w) } {
-            Ok(()) => {}
-            Err(why) => {
-                return Err(crate::Error::CreateSnapshotError(format!(
-                    "failed to get first module from snapshot: {why}"
-                )))
-            }
-        }
+        unsafe { Module32FirstW(snapshot, &mut module_entry_32_w) }.map_err(|why| {
+            crate::Error::CreateSnapshotError(format!(
+                "failed to get first module from snapshot: {why}"
+            ))
+        })?;
         let mut modules = Vec::new();
         loop {
             let name = String::from_utf16_lossy(&module_entry_32_w.szModule)
