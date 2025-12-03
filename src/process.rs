@@ -67,6 +67,8 @@ impl Process {
     }
 
     /// get a `Module` of a `Process` by name
+    ///
+    /// note: the casing matters (don't search for `shell32.dll` if you want `SHELL32.dll`)
     pub fn module(&self, name: &str) -> Result<Module, Error> {
         let Some(snapshot) = snapshot::ModuleSnapshot::get_modules(self.id)?
             .into_iter()
