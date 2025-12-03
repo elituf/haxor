@@ -2,7 +2,7 @@ use crate::{
     Error,
     sys::{handle::Handle, memory, snapshot},
 };
-use derive_more::derive::Display;
+use derive_more::{Debug, derive::Display};
 
 #[derive(Display)]
 /// an identifier for searching for a process
@@ -33,6 +33,7 @@ pub struct Process {
     /// the process id  (th32ProcessID)
     pub id: u32,
     /// the base address of the module with the same name as `name` (modBaseAddr)
+    #[debug("0x{base_address:X}")]
     pub base_address: usize,
     /// the process handle (HANDLE)
     pub handle: Handle,
@@ -138,7 +139,9 @@ pub struct Module {
     /// the module executable path (szExePath)
     pub path: String,
     /// the module base address (modBaseAddr)
+    #[debug("0x{base_address:X}")]
     pub base_address: usize,
     /// the module base size (modBaseSize)
+    #[debug("0x{base_size:X}")]
     pub base_size: usize,
 }
