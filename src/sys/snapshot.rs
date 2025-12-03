@@ -41,7 +41,7 @@ impl ProcessSnapshot {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ModuleSnapshot {
     pub name: String,
     pub path: String,

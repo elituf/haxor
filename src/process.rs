@@ -88,6 +88,21 @@ impl Process {
         Ok(module)
     }
 
+    /// get all `Module`s of a `Process`
+    pub fn modules(&self) -> Result<Vec<Module>, Error> {
+        Ok(snapshot::ModuleSnapshot::get_modules(self.id)?
+            .iter()
+            .cloned()
+            .map(|snapshot| Module {
+                process_id: self.id,
+                name: snapshot.name,
+                path: snapshot.path,
+                base_address: snapshot.base_address,
+                base_size: snapshot.base_size,
+            })
+            .collect())
+    }
+
     /// follow a pointer chain to the end and return an address
     pub fn resolve_pointer_chain(&self, chain: &[usize]) -> Result<usize, Error> {
         let mut chain = chain.to_vec();
