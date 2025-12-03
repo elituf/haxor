@@ -1,5 +1,5 @@
 ## haxor
-memory hacking library
+windows external memory hacking library
 
 ## using
 ```rust
