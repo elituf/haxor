@@ -9,12 +9,12 @@ repository = "https://github.com/elituf/haxor"
 keywords = ["memory", "game", "hacking", "process"]
 
 [dependencies]
-derive_more = { version = "1.0.0", features = ["display"] }
-log = "0.4.22"
-thiserror = "2.0.9"
+derive_more = { version = "2", features = ["display"] }
+log = "0.4"
+thiserror = "2"
 
 [dependencies.windows]
-version = "0.58.0"
+version = "0.62"
 features = [
     "Win32_Foundation",
     "Win32_System_Threading",
