@@ -1,6 +1,6 @@
 use crate::{
-    sys::{handle::Handle, memory, snapshot},
     Error,
+    sys::{handle::Handle, memory, snapshot},
 };
 use derive_more::derive::Display;
 
@@ -45,18 +45,17 @@ impl Process {
     /// initialize a `Process` from a pid or a process name
     pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, Error> {
         let identifier = identifier.into();
-        let Some(snapshot) = (match identifier {
-            Identifier::Pid(pid) => snapshot::ProcessSnapshot::get_processes()?
-                .into_iter()
-                .find(|snapshot| snapshot.id == pid),
-            Identifier::Name(ref name) => snapshot::ProcessSnapshot::get_processes()?
-                .into_iter()
-                .find(|snapshot| snapshot.name == *name),
-        }) else {
-            return Err(Error::CreateProcessError(format!(
-                "failed to find a process with identifier `{identifier}`",
-            )));
-        };
+        let snapshot = snapshot::ProcessSnapshot::get_processes()?
+            .into_iter()
+            .find(|snapshot| match identifier {
+                Identifier::Pid(pid) => snapshot.id == pid,
+                Identifier::Name(ref name) => snapshot.name == *name,
+            })
+            .ok_or_else(|| {
+                Error::CreateProcessError(format!(
+                    "failed to find a process with identifier `{identifier}`",
+                ))
+            })?;
         let mut process = Self {
             name: snapshot.name,
             id: snapshot.id,
