@@ -13,30 +13,26 @@ pub struct ProcessSnapshot {
 
 impl ProcessSnapshot {
     pub fn get_processes() -> Result<Vec<Self>, crate::Error> {
-        let snapshot = unsafe {
-            match CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) {
-                Ok(snapshot) => snapshot,
-                Err(why) => {
-                    return Err(crate::Error::CreateSnapshotError(format!(
-                        "failed to create process snapshot: {why}"
-                    )))
-                }
+        let snapshot = match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) } {
+            Ok(snapshot) => snapshot,
+            Err(why) => {
+                return Err(crate::Error::CreateSnapshotError(format!(
+                    "failed to create process snapshot: {why}"
+                )))
             }
         };
         let mut process_entry_32_w = PROCESSENTRY32W {
             dwSize: u32::try_from(size_of::<PROCESSENTRY32W>())?,
             ..Default::default()
         };
-        unsafe {
-            match Process32FirstW(snapshot, &mut process_entry_32_w) {
-                Ok(()) => {}
-                Err(why) => {
-                    return Err(crate::Error::CreateSnapshotError(format!(
-                        "failed to get first process from snapshot: {why}"
-                    )))
-                }
-            };
-        }
+        match unsafe { Process32FirstW(snapshot, &mut process_entry_32_w) } {
+            Ok(()) => {}
+            Err(why) => {
+                return Err(crate::Error::CreateSnapshotError(format!(
+                    "failed to get first process from snapshot: {why}"
+                )))
+            }
+        };
         let mut processes = Vec::new();
         loop {
             let name = String::from_utf16_lossy(&process_entry_32_w.szExeFile)
@@ -47,11 +43,9 @@ impl ProcessSnapshot {
                 name,
             };
             processes.push(process);
-            unsafe {
-                if Process32NextW(snapshot, &mut process_entry_32_w).is_err() {
-                    break;
-                };
-            }
+            if unsafe { Process32NextW(snapshot, &mut process_entry_32_w) }.is_err() {
+                break;
+            };
         }
         Ok(processes)
     }
@@ -67,28 +61,26 @@ pub struct ModuleSnapshot {
 
 impl ModuleSnapshot {
     pub fn get_modules(pid: u32) -> Result<Vec<Self>, crate::Error> {
-        let snapshot = unsafe {
-            match CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) {
+        let snapshot =
+            match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) }
+            {
                 Ok(snapshot) => snapshot,
                 Err(why) => {
                     return Err(crate::Error::CreateSnapshotError(format!(
                         "failed to create module snapshot: {why}"
                     )))
                 }
-            }
-        };
+            };
         let mut module_entry_32_w = MODULEENTRY32W {
             dwSize: u32::try_from(size_of::<MODULEENTRY32W>())?,
             ..Default::default()
         };
-        unsafe {
-            match Module32FirstW(snapshot, &mut module_entry_32_w) {
-                Ok(()) => {}
-                Err(why) => {
-                    return Err(crate::Error::CreateSnapshotError(format!(
-                        "failed to get first module from snapshot: {why}"
-                    )))
-                }
+        match unsafe { Module32FirstW(snapshot, &mut module_entry_32_w) } {
+            Ok(()) => {}
+            Err(why) => {
+                return Err(crate::Error::CreateSnapshotError(format!(
+                    "failed to get first module from snapshot: {why}"
+                )))
             }
         }
         let mut modules = Vec::new();
@@ -106,10 +98,8 @@ impl ModuleSnapshot {
                 base_size: module_entry_32_w.modBaseSize as usize,
             };
             modules.push(module);
-            unsafe {
-                if Module32NextW(snapshot, &mut module_entry_32_w).is_err() {
-                    break;
-                }
+            if unsafe { Module32NextW(snapshot, &mut module_entry_32_w).is_err() } {
+                break;
             }
         }
         Ok(modules)
