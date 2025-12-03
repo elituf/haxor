@@ -1,7 +1,7 @@
 use crate::Error;
 use windows::Win32::System::Diagnostics::ToolHelp::{
-    CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, Process32FirstW, Process32NextW,
-    MODULEENTRY32W, PROCESSENTRY32W, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, TH32CS_SNAPPROCESS,
+    CreateToolhelp32Snapshot, MODULEENTRY32W, Module32FirstW, Module32NextW, PROCESSENTRY32W,
+    Process32FirstW, Process32NextW, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, TH32CS_SNAPPROCESS,
 };
 
 #[derive(Debug)]
@@ -20,7 +20,7 @@ impl ProcessSnapshot {
             dwSize: u32::try_from(size_of::<PROCESSENTRY32W>())?,
             ..Default::default()
         };
-        unsafe { Process32FirstW(snapshot, &mut process_entry_32_w) }.map_err(|why| {
+        unsafe { Process32FirstW(snapshot, &raw mut process_entry_32_w) }.map_err(|why| {
             Error::CreateSnapshotError(format!("failed to get first process from snapshot: {why}"))
         })?;
         let mut processes = Vec::new();
@@ -33,9 +33,9 @@ impl ProcessSnapshot {
                 name,
             };
             processes.push(process);
-            if unsafe { Process32NextW(snapshot, &mut process_entry_32_w) }.is_err() {
+            if unsafe { Process32NextW(snapshot, &raw mut process_entry_32_w) }.is_err() {
                 break;
-            };
+            }
         }
         Ok(processes)
     }
@@ -60,7 +60,7 @@ impl ModuleSnapshot {
             dwSize: u32::try_from(size_of::<MODULEENTRY32W>())?,
             ..Default::default()
         };
-        unsafe { Module32FirstW(snapshot, &mut module_entry_32_w) }.map_err(|why| {
+        unsafe { Module32FirstW(snapshot, &raw mut module_entry_32_w) }.map_err(|why| {
             Error::CreateSnapshotError(format!("failed to get first module from snapshot: {why}"))
         })?;
         let mut modules = Vec::new();
@@ -78,7 +78,7 @@ impl ModuleSnapshot {
                 base_size: module_entry_32_w.modBaseSize as usize,
             };
             modules.push(module);
-            if unsafe { Module32NextW(snapshot, &mut module_entry_32_w).is_err() } {
+            if unsafe { Module32NextW(snapshot, &raw mut module_entry_32_w).is_err() } {
                 break;
             }
         }

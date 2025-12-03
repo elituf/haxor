@@ -23,7 +23,7 @@ impl Drop for Handle {
     fn drop(&mut self) {
         if let Err(why) = unsafe { CloseHandle(**self) } {
             log::error!("failed to close handle: {why}");
-        };
+        }
     }
 }
 
