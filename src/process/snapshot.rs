@@ -1,5 +1,6 @@
 #![allow(clippy::module_name_repetitions)]
 
+use crate::Error;
 use windows::Win32::System::Diagnostics::ToolHelp::{
     CreateToolhelp32Snapshot, Module32FirstW, Module32NextW, Process32FirstW, Process32NextW,
     MODULEENTRY32W, PROCESSENTRY32W, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, TH32CS_SNAPPROCESS,
@@ -12,21 +13,17 @@ pub struct ProcessSnapshot {
 }
 
 impl ProcessSnapshot {
-    pub fn get_processes() -> Result<Vec<Self>, crate::Error> {
+    pub fn get_processes() -> Result<Vec<Self>, Error> {
         let snapshot =
             unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) }.map_err(|why| {
-                crate::Error::CreateSnapshotError(format!(
-                    "failed to create process snapshot: {why}"
-                ))
+                Error::CreateSnapshotError(format!("failed to create process snapshot: {why}"))
             })?;
         let mut process_entry_32_w = PROCESSENTRY32W {
             dwSize: u32::try_from(size_of::<PROCESSENTRY32W>())?,
             ..Default::default()
         };
         unsafe { Process32FirstW(snapshot, &mut process_entry_32_w) }.map_err(|why| {
-            crate::Error::CreateSnapshotError(format!(
-                "failed to get first process from snapshot: {why}"
-            ))
+            Error::CreateSnapshotError(format!("failed to get first process from snapshot: {why}"))
         })?;
         let mut processes = Vec::new();
         loop {
@@ -55,22 +52,18 @@ pub struct ModuleSnapshot {
 }
 
 impl ModuleSnapshot {
-    pub fn get_modules(pid: u32) -> Result<Vec<Self>, crate::Error> {
+    pub fn get_modules(pid: u32) -> Result<Vec<Self>, Error> {
         let snapshot =
             unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid) }
                 .map_err(|why| {
-                    crate::Error::CreateSnapshotError(format!(
-                        "failed to create module snapshot: {why}"
-                    ))
+                    Error::CreateSnapshotError(format!("failed to create module snapshot: {why}"))
                 })?;
         let mut module_entry_32_w = MODULEENTRY32W {
             dwSize: u32::try_from(size_of::<MODULEENTRY32W>())?,
             ..Default::default()
         };
         unsafe { Module32FirstW(snapshot, &mut module_entry_32_w) }.map_err(|why| {
-            crate::Error::CreateSnapshotError(format!(
-                "failed to get first module from snapshot: {why}"
-            ))
+            Error::CreateSnapshotError(format!("failed to get first module from snapshot: {why}"))
         })?;
         let mut modules = Vec::new();
         loop {

@@ -1,10 +1,8 @@
-use super::handle::Handle;
-
+use crate::{process::handle::Handle, Error};
 use std::{ffi::c_void, ptr};
-
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
 
-pub fn read<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), crate::Error> {
+pub fn read<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), Error> {
     unsafe {
         ReadProcessMemory(
             handle.0,
@@ -14,10 +12,10 @@ pub fn read<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), cra
             None,
         )
     }
-    .map_err(|why| crate::Error::AccessMemoryError(format!("failed to read memory: {why}")))
+    .map_err(|why| Error::AccessMemoryError(format!("failed to read memory: {why}")))
 }
 
-pub fn write<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), crate::Error> {
+pub fn write<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), Error> {
     unsafe {
         WriteProcessMemory(
             handle.0,
@@ -27,5 +25,5 @@ pub fn write<T>(handle: &Handle, address: usize, value: &mut T) -> Result<(), cr
             None,
         )
     }
-    .map_err(|why| crate::Error::AccessMemoryError(format!("failed to write memory: {why}")))
+    .map_err(|why| Error::AccessMemoryError(format!("failed to write memory: {why}")))
 }

@@ -1,8 +1,8 @@
+use crate::Error;
 use std::ops::Deref;
-
-use windows::Win32::Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE};
-use windows::Win32::System::Threading::{
-    OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_READ, PROCESS_VM_WRITE,
+use windows::Win32::{
+    Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE},
+    System::Threading::{OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_READ, PROCESS_VM_WRITE},
 };
 
 #[derive(Debug, Default, Clone)]
@@ -28,16 +28,16 @@ impl Drop for Handle {
 }
 
 impl Handle {
-    pub fn from_pid(pid: u32) -> Result<Self, crate::Error> {
+    pub fn from_pid(pid: u32) -> Result<Self, Error> {
         let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, false, pid) }
             .or_else(|_| unsafe { OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE, false, pid) })
             .map_err(|why| {
-                crate::Error::ObtainHandleError(format!(
+                Error::ObtainHandleError(format!(
                     "failed to open process with needed access: {why}",
                 ))
             })?;
         if handle == INVALID_HANDLE_VALUE {
-            return Err(crate::Error::ObtainHandleError(
+            return Err(Error::ObtainHandleError(
                 "failed to get a valid handle".to_string(),
             ));
         }
