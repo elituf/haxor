@@ -7,9 +7,9 @@ use derive_more::derive::Display;
 #[derive(Display)]
 /// an identifier for searching for a process
 pub enum Identifier {
-    /// the process id
+    /// process id to search for
     Pid(u32),
-    /// the process name
+    /// process name to search for
     Name(String),
 }
 
@@ -66,7 +66,7 @@ impl Process {
         Ok(process)
     }
 
-    /// get the `Module` of a `Process` by name
+    /// get a `Module` of a `Process` by name
     pub fn module(&self, name: &str) -> Result<Module, Error> {
         let Some(snapshot) = snapshot::ModuleSnapshot::get_modules(self.id)?
             .into_iter()
