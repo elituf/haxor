@@ -1,4 +1,4 @@
-use crate::{process::handle::Handle, Error};
+use crate::{sys::handle::Handle, Error};
 use std::{ffi::c_void, ptr};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
 
