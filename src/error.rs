@@ -15,6 +15,9 @@ pub enum Error {
     /// there was a failure in building the Process or Module struct
     #[error("failed to get process/module")]
     ProcessError(String),
+    /// there was a failure in resolving a pointer chain
+    #[error("failed to resolve pointer chain")]
+    ResolvePointerChainError(String),
     /// there was a failure in conversion between integers
     #[error("failed to convert integer")]
     ConvertIntegerError(#[from] std::num::TryFromIntError),

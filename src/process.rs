@@ -101,13 +101,15 @@ impl Process {
 
     /// follow a pointer chain to the end and return an address
     pub fn resolve_pointer_chain(&self, chain: &[usize]) -> Result<usize, Error> {
-        let mut chain = chain.to_vec();
-        let mut address = chain.remove(0);
-        while chain.len() > 1 {
-            address += chain.remove(0);
+        if chain.is_empty() {
+            return Err(Error::ResolvePointerChainError("chain was empty".into()));
+        }
+        let mut address = chain[0];
+        for &offset in &chain[1..(chain.len() - 1)] {
+            address += offset;
             address = self.read_mem(address)?;
         }
-        Ok(address + chain.remove(0))
+        Ok(address + chain.last().expect("chain should have a last element"))
     }
 
     /// read a given `address` of process's memory
