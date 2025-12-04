@@ -50,7 +50,7 @@ impl Process {
                 Identifier::Name(ref name) => snapshot.name == *name,
             })
             .ok_or_else(|| {
-                Error::CreateProcessError(format!(
+                Error::ProcessError(format!(
                     "failed to find a process with identifier `{identifier}`",
                 ))
             })?;
@@ -70,7 +70,7 @@ impl Process {
             .into_iter()
             .find(|snapshot| name.eq_ignore_ascii_case(&snapshot.name))
         else {
-            return Err(Error::CreateProcessError(format!(
+            return Err(Error::ProcessError(format!(
                 "failed to find a module with identifier `{name}`",
             )));
         };
