@@ -41,6 +41,16 @@ pub struct Process {
 
 impl Process {
     /// initialize a `Process` from a pid or a process name
+    ///
+    /// ### examples
+    ///
+    /// ```rust
+    /// let proc = Process::find(1337)?;
+    /// ```
+    ///
+    /// ```rust
+    /// let proc = Process::find("notepad.exe")?;
+    /// ```
     pub fn find<T: Into<Identifier>>(identifier: T) -> Result<Self, Error> {
         let identifier = identifier.into();
         let snapshot = snapshot::ProcessSnapshot::get_processes()?
