@@ -4,33 +4,6 @@ use crate::{
 };
 use derive_more::{Debug, derive::Display};
 
-#[derive(Display)]
-/// an identifier for searching for a process
-pub enum Identifier {
-    /// process id to search for
-    Pid(u32),
-    /// process name to search for
-    Name(String),
-}
-
-impl From<u32> for Identifier {
-    fn from(value: u32) -> Self {
-        Self::Pid(value)
-    }
-}
-
-impl From<&str> for Identifier {
-    fn from(value: &str) -> Self {
-        Self::Name(value.to_string())
-    }
-}
-
-impl From<String> for Identifier {
-    fn from(value: String) -> Self {
-        Self::Name(value)
-    }
-}
-
 #[derive(Debug, Default, Clone)]
 /// a process running on the system
 pub struct Process {
@@ -162,4 +135,31 @@ pub struct Module {
     /// the module base size (modBaseSize)
     #[debug("0x{base_size:X}")]
     pub base_size: usize,
+}
+
+#[derive(Display)]
+/// an identifier for searching for a process
+pub enum Identifier {
+    /// process id to search for
+    Pid(u32),
+    /// process name to search for
+    Name(String),
+}
+
+impl From<u32> for Identifier {
+    fn from(value: u32) -> Self {
+        Self::Pid(value)
+    }
+}
+
+impl From<&str> for Identifier {
+    fn from(value: &str) -> Self {
+        Self::Name(value.to_string())
+    }
+}
+
+impl From<String> for Identifier {
+    fn from(value: String) -> Self {
+        Self::Name(value)
+    }
 }
