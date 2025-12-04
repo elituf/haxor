@@ -41,7 +41,7 @@ pub struct Process {
 
 impl Process {
     /// initialize a `Process` from a pid or a process name
-    pub fn from<T: Into<Identifier>>(identifier: T) -> Result<Self, Error> {
+    pub fn find<T: Into<Identifier>>(identifier: T) -> Result<Self, Error> {
         let identifier = identifier.into();
         let snapshot = snapshot::ProcessSnapshot::get_processes()?
             .into_iter()
