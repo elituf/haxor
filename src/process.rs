@@ -25,6 +25,12 @@ impl From<&str> for Identifier {
     }
 }
 
+impl From<String> for Identifier {
+    fn from(value: String) -> Self {
+        Self::Name(value)
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 /// a process running on the system
 pub struct Process {
@@ -75,7 +81,8 @@ impl Process {
     }
 
     /// get a `Module` of a `Process` by name (case-insensitive)
-    pub fn module(&self, name: &str) -> Result<Module, Error> {
+    pub fn module<T: AsRef<str>>(&self, name: T) -> Result<Module, Error> {
+        let name = name.as_ref();
         let Some(snapshot) = snapshot::ModuleSnapshot::get_modules(self.id)?
             .into_iter()
             .find(|snapshot| name.eq_ignore_ascii_case(&snapshot.name))
@@ -110,7 +117,8 @@ impl Process {
     }
 
     /// follow a pointer chain to the end and return an address
-    pub fn resolve_pointer_chain(&self, chain: &[usize]) -> Result<usize, Error> {
+    pub fn resolve_pointer_chain<T: AsRef<[usize]>>(&self, chain: T) -> Result<usize, Error> {
+        let chain = chain.as_ref();
         if chain.is_empty() {
             return Err(Error::ResolvePointerChainError("chain was empty".into()));
         }
