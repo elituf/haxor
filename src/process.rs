@@ -32,7 +32,7 @@ pub struct Process {
     pub name: String,
     /// the process id  (th32ProcessID)
     pub id: u32,
-    /// the base address of the module with the same name as `name` (modBaseAddr)
+    /// the base address of the module with the name `name` (modBaseAddr)
     #[debug("0x{base_address:X}")]
     pub base_address: usize,
     /// the process handle (HANDLE)
