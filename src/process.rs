@@ -120,7 +120,7 @@ impl Process {
     }
 
     /// write a `value` at given `address` of process's memory
-    pub fn write_mem<T: Default>(&self, address: usize, mut value: T) -> Result<(), Error> {
+    pub fn write_mem<T>(&self, address: usize, mut value: T) -> Result<(), Error> {
         memory::write(&self.handle, address, &mut value)?;
         Ok(())
     }
