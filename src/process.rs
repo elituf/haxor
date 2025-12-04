@@ -104,6 +104,9 @@ impl Process {
         if chain.is_empty() {
             return Err(Error::ResolvePointerChainError("chain was empty".into()));
         }
+        if chain.len() == 1 {
+            return Ok(chain[0]);
+        }
         let mut address = chain[0];
         for &offset in &chain[1..(chain.len() - 1)] {
             address += offset;
