@@ -12,15 +12,11 @@ keywords = ["memory", "game", "hacking", "process"]
 derive_more = { version = "2", features = ["debug", "display"] }
 log = "0.4"
 thiserror = "2"
-
-[dependencies.windows]
-version = "0.62"
-features = [
-    "Win32_Foundation",
+windows = { version = "0.62", features = [
     "Win32_System_Threading",
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_Diagnostics_Debug",
-]
+] }
 
 [lib]
 doctest = false
