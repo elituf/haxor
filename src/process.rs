@@ -2,7 +2,7 @@ use crate::{
     error::Error,
     sys::{handle::Handle, memory, snapshot},
 };
-use derive_more::{Debug, From, derive::Display};
+use derive_more::{Debug, Display, From};
 
 #[derive(Debug, Default, Clone)]
 /// a process running on the system
