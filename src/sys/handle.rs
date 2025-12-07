@@ -1,4 +1,4 @@
-use crate::Error;
+use crate::error::Error;
 use std::ops::Deref;
 use windows::Win32::{
     Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE},

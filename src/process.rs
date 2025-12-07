@@ -1,5 +1,5 @@
 use crate::{
-    Error,
+    error::Error,
     sys::{handle::Handle, memory, snapshot},
 };
 use derive_more::{Debug, derive::Display};
