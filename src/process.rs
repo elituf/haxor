@@ -2,7 +2,7 @@ use crate::{
     error::Error,
     sys::{handle::Handle, memory, snapshot},
 };
-use derive_more::{Debug, derive::Display};
+use derive_more::{Debug, From, derive::Display};
 
 #[derive(Debug, Default, Clone)]
 /// a process running on the system
@@ -137,29 +137,13 @@ pub struct Module {
     pub base_size: usize,
 }
 
-#[derive(Display)]
+#[derive(Display, From)]
 /// an identifier for searching for a process
 pub enum Identifier {
     /// process id to search for
+    #[from(u32)]
     Pid(u32),
     /// process name to search for
+    #[from(&str, String)]
     Name(String),
-}
-
-impl From<u32> for Identifier {
-    fn from(value: u32) -> Self {
-        Self::Pid(value)
-    }
-}
-
-impl From<&str> for Identifier {
-    fn from(value: &str) -> Self {
-        Self::Name(value.to_string())
-    }
-}
-
-impl From<String> for Identifier {
-    fn from(value: String) -> Self {
-        Self::Name(value)
-    }
 }
