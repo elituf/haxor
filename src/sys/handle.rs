@@ -1,7 +1,7 @@
 use crate::error::Error;
 use derive_more::Deref;
 use windows::Win32::{
-    Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE},
+    Foundation::{CloseHandle, HANDLE},
     System::Threading::{OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_READ, PROCESS_VM_WRITE},
 };
 
@@ -28,7 +28,7 @@ impl Handle {
                     "failed to open process with needed access: {why}",
                 ))
             })?;
-        if handle == INVALID_HANDLE_VALUE {
+        if handle.is_invalid() {
             return Err(Error::ObtainHandleError(
                 "failed to get a valid handle".to_string(),
             ));
