@@ -1,23 +1,15 @@
 use crate::error::Error;
-use std::ops::Deref;
+use derive_more::Deref;
 use windows::Win32::{
     Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE},
     System::Threading::{OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_READ, PROCESS_VM_WRITE},
 };
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Deref, Clone)]
 pub struct Handle(pub HANDLE);
 
 unsafe impl Send for Handle {}
 unsafe impl Sync for Handle {}
-
-impl Deref for Handle {
-    type Target = HANDLE;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
 
 impl Drop for Handle {
     fn drop(&mut self) {

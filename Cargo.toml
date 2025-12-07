@@ -9,7 +9,12 @@ repository = "https://github.com/elituf/haxor"
 keywords = ["memory", "game", "hacking", "process"]
 
 [dependencies]
-derive_more = { version = "2", features = ["debug", "display", "from"] }
+derive_more = { version = "2", features = [
+    "debug",
+    "deref",
+    "display",
+    "from",
+] }
 log = "0.4"
 thiserror = "2"
 windows = { version = "0.62", features = [
